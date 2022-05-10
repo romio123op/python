@@ -1,0 +1,11 @@
+
+f = open("snt.txt", "a")
+
+for x in range(1,100):
+    check = True 
+    for y in range(2,x-1):
+        if (x % y) == 0:
+            check = False  
+    if check:
+        f.write('\n' + str(x))
+f.close()
