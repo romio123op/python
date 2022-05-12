@@ -26,8 +26,13 @@ mydb = mysql.connector.connect(
 )
 
 
-@app.route('/ahuhu', methods=["POST"])
+@app.route('/ahuhu', methods=["POST","GET"])
 def index():
+    if request.method == "GET":
+        headers = request.headers
+        token = headers.get('token', None)
+        if token and token == '123456':
+            return 'login noauthen'
     if request.method == "POST":
         details = request.json
         username = details.get('username', None)
@@ -54,17 +59,35 @@ def index():
         # cur.close()
         if (myresult):
             return {
-                "myresult":myresult,
-                "user": myresult[0][0]
+                "thông tin":"Đăng nhập thành công"
             }
         else:
             return {
                 'error': 'Taì khoản không đúng hoặc chưa được đăng ký'
             }
-    return {
-        'error': "login success !!!"
-    }
+    # return {
+    #     'error': "login success !!!"
+    # }
 
-
-# if __name__ == '__main__':
-#     app.run()
+@app.route('/register', methods=["POST","GET"])
+def reg():
+    if request.method == "POST":
+        details = request.json
+        username = details.get('username', None)
+        password = details.get('password', None)
+        repassword= details.get('repassword', None)
+        if password == repassword:
+            mycursor = mydb.cursor()
+            sql = "INSERT INTO account (username, password) VALUES (%s, %s)"
+            val = (username, password)
+            mycursor.execute(sql, val)
+            mydb.commit()
+            mydb.close()
+            return{
+                'thông tin':"tài khoản đã được tạo"
+            }
+        else:
+            return{
+                'thông tin':"Mật khẩu không trùng khớp"
+            }
+            
