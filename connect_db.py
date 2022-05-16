@@ -1,32 +1,19 @@
 from crypt import methods
+from distutils.command.config import config
+import MySQLdb
 from flask import Flask, render_template, request
 # from flask_mysqldb import MySQL
-
+import config
+from page import insertDB
+from page import closeDB
+from page import accountInfo
 # cài thêm thư viện
 # pip3 install mysql-connector
 import mysql.connector
 app = Flask(__name__)
 
 
-# app.config['MYSQL_HOST'] = '192.168.100.120'
-# app.config['MYSQL_PORT'] = '3306'
-# app.config['MYSQL_USER'] = 'ipos'
-# app.config['MYSQL_PASSWORD'] = 'iT@2o19$'
-# app.config['MYSQL_DB'] = 'customer'
-
-# mysql = MySQL(app)
-
-
-
-mydb = mysql.connector.connect(
-    host="192.168.100.120",
-    user="ipos",
-    password="iT@2o19$",
-    database="customer"
-)
-
-
-@app.route('/ahuhu', methods=["POST","GET"])
+@app.route('/login', methods=["POST","GET"])
 def index():
     if request.method == "GET":
         headers = request.headers
@@ -39,35 +26,24 @@ def index():
         password = details.get('password', None)
         if not username or not password:
             return {
-                'error': 'Thông tin param bị thiếu'
+                "error": config.msg.get("INFO_NOT_ENOUGH")
             }
-        # cur = mysql.connection.cursor()
-        mycursor = mydb.cursor()
-
+        # mycursor = mydb.cursor()
+        mycursor = accountInfo()
         sql = "SELECT * FROM account WHERE username = %s and password = %s"
         adr = (username, password, )
 
         mycursor.execute(sql, adr)
-
-        # print('connect',cur)
-        # res = cur.execute("SELECT * FROM account where username = "+username+"and password="+password )
-        # res = cur.execute("SELECT * FROM account")
-
         myresult = mycursor.fetchall()
 
-        # mysql.connection.commit()
-        # cur.close()
         if (myresult):
             return {
-                "thông tin":"Đăng nhập thành công"
+                "thông tin": config.msg.get("LOGGED")
             }
         else:
             return {
-                'error': 'Taì khoản không đúng hoặc chưa được đăng ký'
+                'error': config.msg.get("ERROR")
             }
-    # return {
-    #     'error': "login success !!!"
-    # }
 
 @app.route('/register', methods=["POST","GET"])
 def reg():
@@ -77,17 +53,22 @@ def reg():
         password = details.get('password', None)
         repassword= details.get('repassword', None)
         if password == repassword:
-            mycursor = mydb.cursor()
+            mycursor = accountInfo()
             sql = "INSERT INTO account (username, password) VALUES (%s, %s)"
             val = (username, password)
             mycursor.execute(sql, val)
-            mydb.commit()
-            mydb.close()
+            # mydb.commit()
+            ins = insertDB()
+            clo = closeDB()
+            # mydb.close()
             return{
-                'thông tin':"tài khoản đã được tạo"
-            }
+                    'thông tin': config.msg.get("ACCOUNT_CREATE")
+                }
         else:
             return{
-                'thông tin':"Mật khẩu không trùng khớp"
-            }
+                    'thông tin': config.msg.get("CHECK_REPASS")
+                }
+
+
+        
             
