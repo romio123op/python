@@ -5,7 +5,8 @@ from flask import Flask, render_template, request
 # from flask_mysqldb import MySQL
 import config
 import constant
-from page import insertDB,closeDB,accountInfo,collect_login
+from template import rt_success,rt_error
+from connect_db import insertDB,closeDB,accountInfo,collect_login,collect_register
 # cài thêm thư viện
 # pip3 install mysql-connector
 import mysql.connector
@@ -18,7 +19,7 @@ def index():
         headers = request.headers
         token = headers.get('token', None)
         if token and token == '123456':
-            return 'login noauthen'
+            return rt_success("Đăng Nhập Thành Công")
     if request.method == "POST":
         details = request.json
         username = details.get('username', None)
@@ -45,14 +46,8 @@ def reg():
         password = details.get('password', None)
         repassword= details.get('repassword', None)
         if password == repassword:
-            mycursor = accountInfo()
-            sql = "INSERT INTO account (username, password) VALUES (%s, %s)"
-            val = (username, password)
-            mycursor.execute(sql, val)
-            # mydb.commit()
-            ins = insertDB()
+            result = collect_register(username,password,repassword)
             clo = closeDB()
-            # mydb.close()
             return{
                     'thông tin': constant.msg.get("ACCOUNT_CREATE")
                 }

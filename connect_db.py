@@ -33,3 +33,12 @@ def collect_login(username,password):
     mycursor.execute(sql, adr)
     myresult = mycursor.fetchall()
     return myresult
+
+def collect_register(username,password,repassword):
+    mycursor = mydb.cursor()
+    sql = "INSERT INTO account (username, password) VALUES (%s, %s)"
+    val = (username, password)
+    rs=mycursor.execute(sql, val)
+    mydb.commit()
+    return rs
+
