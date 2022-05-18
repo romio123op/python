@@ -2,13 +2,10 @@ from crypt import methods
 from distutils.command.config import config
 import MySQLdb
 from flask import Flask, render_template, request
-# from flask_mysqldb import MySQL
 import config
 import constant
 from template import rt_success,rt_error
 from connect_db import insertDB,closeDB,accountInfo,collect_login,collect_register
-# cài thêm thư viện
-# pip3 install mysql-connector
 import mysql.connector
 app = Flask(__name__)
 
@@ -26,16 +23,16 @@ def index():
         password = details.get('password', None)
         if not username or not password:
             return {
-                "error": constant.msg.get("INFO_NOT_ENOUGH")
+                "error": constant.infor_not_enough
             }
         myresult = collect_login(username,password)
         if (myresult):
             return {
-                "data": constant.msg.get("LOGGED")
+                "data": constant.logged
             }
         else:
             return {
-                'error': constant.msg.get("ERROR")
+                'error': constant.error
             }
 
 @app.route('/register', methods=["POST","GET"])
@@ -47,13 +44,12 @@ def reg():
         repassword= details.get('repassword', None)
         if password == repassword:
             result = collect_register(username,password,repassword)
-            clo = closeDB()
             return{
-                    'thông tin': constant.msg.get("ACCOUNT_CREATE")
+                    'thông tin': constant.account_create
                 }
         else:
             return{
-                    'thông tin': constant.msg.get("CHECK_REPASS")
+                    'thông tin': constant.check_repass
                 }
 
 

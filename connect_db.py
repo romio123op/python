@@ -3,15 +3,16 @@ from distutils.command.config import config
 from sqlite3 import connect
 import MySQLdb
 from flask import Flask, render_template, request
-import config
+import constant
 import mysql.connector
 app = Flask(__name__)
 
 mydb = mysql.connector.connect(
-    host= config.db_info['host'],
-    user=config.db_info['user'],
-    password=config.db_info['password'],
-    database=config.db_info['database']
+    host= constant.db_info['host'],
+    user=constant.db_info['user'],
+    password=constant.db_info['password'],
+    database=constant.db_info['database'],
+    
 )
 
 def accountInfo():
@@ -40,5 +41,6 @@ def collect_register(username,password,repassword):
     val = (username, password)
     rs=mycursor.execute(sql, val)
     mydb.commit()
+    mydb.close()
     return rs
 
